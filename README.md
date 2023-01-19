@@ -1,4 +1,4 @@
-# Cilist
+# Cilist Test
 Simple CRUD app built with MySQL, ExpressJS, React, & Node.
 
 `Database    : MySQL`
@@ -10,7 +10,8 @@ Simple CRUD app built with MySQL, ExpressJS, React, & Node.
 # Setup
 
 ## Database
-First you need to create database & user in MySQL in order to connect `Backend` to `Database` staging.
+
+First you need to create database & user in MySQL in order to connect `Backend` to `Database` master.
 
 ```
 sudo mysql -u root -p
