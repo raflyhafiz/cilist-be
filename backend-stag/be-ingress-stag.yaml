@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: api-stag.cilist.my.id
+  - host: api-staging.cilist.my.id
     http:
       paths:
       - path: /
