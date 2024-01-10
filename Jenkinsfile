@@ -1,5 +1,11 @@
 pipeline {  
-  agent any 
+  agent any
+   tools{
+        jdk 'jdk17'
+    }
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    } 
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))   
   }
@@ -37,13 +43,6 @@ pipeline {
                 }
         }
       }
-    }
-     tools{
-        jdk 'jdk17'
-        nodejs 'node16'
-    }
-    environment {
-        SCANNER_HOME=tool 'sonar-scanner'
     }
     stage("Sonarqube Analysis "){
             steps{
