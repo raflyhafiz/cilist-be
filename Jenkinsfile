@@ -44,52 +44,34 @@ pipeline {
         }
       }
     }
-    stage("Sonarqube Analysis "){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=becilist \
-                    -Dsonar.projectKey=becilist '''
-                }
-            }
-        }
-        // stage("quality gate"){
-        //    steps {
-        //         script {
-        //             waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
-        //         }
-        //     } 
-        // }
-        stage('OWASP FS SCAN') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-        stage('TRIVY FS SCAN') {
-            steps {
-                sh "trivy fs . > trivyfs.txt"
-            }
-        }
-
-    //  stage('Deploy to Kubernetes') {
-    //     steps {
-    //         script {
-    //             if (env.BRANCH_NAME == 'staging') {
-    //                 kubeconfig(credentialsId: 'kubernetesconfig', serverUrl: '') {
-    //                     sh 'cat backend-stag/be-stag.yaml | sed "s/{{NEW_TAG}}/0.0.$BUILD_NUMBER-staging/g" | kubectl apply -f -'
-    //                 }
-    //             }
-    //             else if (env.BRANCH_NAME == 'master') {
-    //                 kubeconfig(credentialsId: 'kubernetesconfig', serverUrl: '') {
-    //                     sh 'cat backend-prod/be-prod.yaml | sed "s/{{NEW_TAG}}/0.0.$BUILD_NUMBER-master/g" | kubectl apply -f -'
-    //                 }
-    //             }
-    //             else {
-    //                 echo "Tidak ada yg dideploy"
+    // stage("Sonarqube Analysis "){
+    //         steps{
+    //             withSonarQubeEnv('sonar-server') {
+    //                 sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=becilist \
+    //                 -Dsonar.projectKey=becilist '''
     //             }
     //         }
     //     }
-    // } 
+
+     stage('Deploy to Kubernetes') {
+        steps {
+            script {
+                if (env.BRANCH_NAME == 'staging') {
+                    kubeconfig(credentialsId: 'configk8', serverUrl: '') {
+                        sh 'cat backend-stag/be-stag.yaml | sed "s/{{NEW_TAG}}/0.0.$BUILD_NUMBER-staging/g" | kubectl apply -f -'
+                    }
+                }
+                else if (env.BRANCH_NAME == 'master') {
+                    kubeconfig(credentialsId: 'configk8', serverUrl: '') {
+                        sh 'cat backend-prod/be-prod.yaml | sed "s/{{NEW_TAG}}/0.0.$BUILD_NUMBER-master/g" | kubectl apply -f -'
+                    }
+                }
+                else {
+                    echo "Tidak ada yg dideploy"
+                }
+            }
+        }
+    } 
 }
     //  post {
     //         success {
