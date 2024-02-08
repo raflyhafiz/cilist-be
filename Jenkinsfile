@@ -98,9 +98,9 @@ pipeline {
      post {
             success {
                 slackSend channel: '#jenkinsnotif',
+                slackUploadFile filepath: 'trivyfs.txt,trivyimage.txt',
                 color: 'good',
                 message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
-                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
             }    
 
             failure {
