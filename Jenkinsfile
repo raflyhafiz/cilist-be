@@ -68,6 +68,11 @@ pipeline {
                 }
             }
         }
+    stage('Upload file'){
+        steps{
+            slackUploadFile filepath: 'trivyfs.txt,trivyimage.txt', initialComment: 'Here is your file'
+        }
+    }
         
     //  stage('Deploy to Kubernetes') {
     //     steps {
@@ -98,7 +103,6 @@ pipeline {
      post {
             success {
                 slackSend channel: '#jenkinsnotif',
-                slackUploadFile filepath: 'trivyfs.txt,trivyimage.txt',
                 color: 'good',
                 message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
             }    
