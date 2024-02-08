@@ -10,6 +10,17 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))   
   }
   stages {
+    stage('OWASP FS SCAN') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
     stage('Build Image Backend') {
         steps {
             script{
@@ -44,6 +55,11 @@ pipeline {
         }
       }
     }
+    stage("TRIVY"){
+            steps{
+                sh "trivy image raflyhafiz/cilist-be:0.0.$BUILD_NUMBER-staging > trivyimage.txt" 
+            }
+        }
     stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-server') {
@@ -52,7 +68,7 @@ pipeline {
                 }
             }
         }
-
+        
     //  stage('Deploy to Kubernetes') {
     //     steps {
     //         script {
@@ -79,20 +95,21 @@ pipeline {
     //     }
     // } 
 }
-    //  post {
-    //         success {
-    //             slackSend channel: '#jenkinsnotif',
-    //             color: 'good',
-    //             message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}"
-    //         }    
+     post {
+            success {
+                slackSend channel: '#jenkinsnotif',
+                color: 'good',
+                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}"
+                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+            }    
 
-    //         failure {
-    //             slackSend channel: '#jenkinsnotif',
-    //             color: 'danger',
-    //             message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}"
-    //             }
+            failure {
+                slackSend channel: '#jenkinsnotif',
+                color: 'danger',
+                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}"
+                }
 
-    //     }
+        }
        
 }
 
