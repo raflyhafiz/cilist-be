@@ -41,7 +41,7 @@ pipeline {
             }
         }
     }
-    stage('Push to Registry Backend') {
+    stage('Push to Registry Backenddddddd') {
         steps {
             script {
              if (env.BRANCH_NAME == 'staging') {
